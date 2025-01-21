@@ -1,1 +1,5 @@
 bob	Cleartext-Password := "test"
+	Service-Type = Callback-Login-User,
+	Callback-Number = "9,5551212",
+	Framed-IP-Address = 172.16.3.33,
+	Framed-IP-Netmask = 255.255.255.0
