@@ -38,3 +38,8 @@ var responsePacket = await client.SendPacketAsync(
     new IPEndPoint(IPAddress.Parse(host), 1812));
 
 Console.WriteLine($"{responsePacket.Code}");
+
+foreach (var attr in responsePacket.Attributes)
+{
+    Console.WriteLine($"{attr.Key} {attr.Value[0]}");
+}
