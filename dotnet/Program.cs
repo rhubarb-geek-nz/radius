@@ -41,5 +41,12 @@ Console.WriteLine($"{responsePacket.Code}");
 
 foreach (var attr in responsePacket.Attributes)
 {
-    Console.WriteLine($"{attr.Key} {attr.Value[0]}");
+    var value = attr.Value[0];
+
+    if (value is byte[] ba)
+    {
+        value=Convert.ToHexString(ba);
+    }
+
+    Console.WriteLine($"{attr.Key} {value}");
 }
