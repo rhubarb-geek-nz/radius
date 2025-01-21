@@ -102,7 +102,11 @@ public class Main {
           } else {
             if (d instanceof VsaData) {
               VsaData t = (VsaData) d;
-              sb.append("{vsaData=");
+              sb.append("{vendorId=");
+              sb.append(t.getVendorId());
+              sb.append(", vendorType=");
+              sb.append(t.getVendorType());
+              sb.append(", vsaData=");
               describe(t.getVsaData(), sb);
               sb.append("}");
 
