@@ -102,7 +102,7 @@ public class Main {
           } else {
             if (d instanceof VsaData) {
               VsaData t = (VsaData) d;
-              sb.append("{string=");
+              sb.append("{vsaData=");
               describe(t.getVsaData(), sb);
               sb.append("}");
 
