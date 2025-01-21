@@ -45,7 +45,7 @@ foreach (var attr in responsePacket.Attributes)
 
     if (value is byte[] ba)
     {
-        value=Convert.ToHexString(ba);
+        value = Convert.ToHexString(ba);
     }
 
     Console.WriteLine($"{attr.Key} {value}");
