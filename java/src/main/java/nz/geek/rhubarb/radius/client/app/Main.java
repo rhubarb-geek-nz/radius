@@ -2,22 +2,14 @@
 // Licensed under the MIT License.
 package nz.geek.rhubarb.radius.client.app;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import org.aaa4j.radius.client.RadiusClient;
 import org.aaa4j.radius.client.RadiusClientException;
 import org.aaa4j.radius.client.clients.UdpRadiusClient;
-import org.aaa4j.radius.core.attribute.Attribute;
-import org.aaa4j.radius.core.attribute.AttributeType;
-import org.aaa4j.radius.core.attribute.Data;
-import org.aaa4j.radius.core.attribute.EnumData;
-import org.aaa4j.radius.core.attribute.IntegerData;
-import org.aaa4j.radius.core.attribute.Ipv4AddrData;
-import org.aaa4j.radius.core.attribute.StringData;
-import org.aaa4j.radius.core.attribute.TextData;
+import org.aaa4j.radius.core.attribute.*;
 import org.aaa4j.radius.core.attribute.attributes.MessageAuthenticator;
 import org.aaa4j.radius.core.attribute.attributes.NasPort;
 import org.aaa4j.radius.core.attribute.attributes.UserName;
@@ -36,11 +28,11 @@ public class Main {
     String password = args[i++];
     String host = args[i++];
     String port = args[i++];
-    String secret = args[i++];
+    String secret = args[i];
 
     RadiusClient radiusClient =
         UdpRadiusClient.newBuilder()
-            .secret(secret.getBytes(UTF_8))
+            .secret(secret.getBytes(StandardCharsets.UTF_8))
             .address(new InetSocketAddress(host, 1812))
             .build();
 
@@ -49,7 +41,7 @@ public class Main {
             Arrays.asList(
                 new MessageAuthenticator(),
                 new UserName(new TextData(user)),
-                new UserPassword(new StringData(password.getBytes(UTF_8))),
+                new UserPassword(new StringData(password.getBytes(StandardCharsets.UTF_8))),
                 new NasPort(new IntegerData(Integer.parseInt(port)))));
 
     Packet responsePacket = radiusClient.send(accessRequest);
@@ -61,7 +53,7 @@ public class Main {
         System.out.println("Rejected");
       }
 
-      for (Attribute attr : responsePacket.getAttributes()) {
+      for (Attribute<?> attr : responsePacket.getAttributes()) {
         StringBuilder sb = new StringBuilder();
         describe(attr, sb);
         System.out.println(sb.toString());
@@ -69,9 +61,9 @@ public class Main {
     }
   }
 
-  static void describe(Attribute attr, StringBuilder sb)
+  static void describe(Attribute<?> attr, StringBuilder sb)
       throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-    Class c = attr.getClass();
+    Class<?> c = attr.getClass();
     Field f = c.getField("NAME");
     Object name = f.get(null);
     sb.append("name=");
@@ -105,16 +97,21 @@ public class Main {
           if (d instanceof StringData) {
             StringData t = (StringData) d;
             sb.append("{string=");
-            byte[] v = t.getValue();
-            for (int i = 0; i < t.length(); i++) {
-              sb.append(String.format("%02x", v[i]));
-            }
+            describe(t.getValue(), sb);
             sb.append("}");
           } else {
-            if (d == null) {
-              sb.append("null");
+            if (d instanceof VsaData) {
+              VsaData t = (VsaData) d;
+              sb.append("{string=");
+              describe(t.getVsaData(), sb);
+              sb.append("}");
+
             } else {
-              sb.append(d.toString());
+              if (d == null) {
+                sb.append("null");
+              } else {
+                sb.append(d.toString());
+              }
             }
           }
         }
@@ -133,5 +130,11 @@ public class Main {
       comma = true;
     }
     sb.append("}");
+  }
+
+  static void describe(byte[] a, StringBuilder sb) {
+    for (int i = 0; i < a.length; i++) {
+      sb.append(String.format("%02x", a[i]));
+    }
   }
 }
