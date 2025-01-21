@@ -68,7 +68,6 @@ public class Main {
     Object name = f.get(null);
     sb.append("name=");
     sb.append(name);
-
     sb.append(", type=");
     describe(attr.getType(), sb);
     sb.append(", data=");
@@ -109,7 +108,6 @@ public class Main {
               sb.append(", vsaData=");
               describe(t.getVsaData(), sb);
               sb.append("}");
-
             } else {
               if (d == null) {
                 sb.append("null");
@@ -137,8 +135,8 @@ public class Main {
   }
 
   static void describe(byte[] a, StringBuilder sb) {
-    for (int i = 0; i < a.length; i++) {
-      sb.append(String.format("%02x", a[i]));
+    for (byte b : a) {
+      sb.append(String.format("%02x", b));
     }
   }
 }
